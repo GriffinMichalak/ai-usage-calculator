@@ -2,7 +2,6 @@ import ToggleButtonGroup, { toggleButtonGroupClasses } from '@mui/material/Toggl
 import { createTheme, styled } from '@mui/material/styles'
 import { toggleButtonClasses } from '@mui/material/ToggleButton'
 
-
 export const theme = createTheme({
   palette: {
     primary: { main: '#aa3bff' },
@@ -38,9 +37,9 @@ export const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme: t }) 
     borderLeft: `1px solid ${(t.vars || t).palette.divider}`,
   },
   [`& .${toggleButtonGroupClasses.lastButton}.${toggleButtonClasses.disabled}, & .${toggleButtonGroupClasses.middleButton}.${toggleButtonClasses.disabled}`]:
-  {
-    borderLeft: `1px solid ${(t.vars || t).palette.action.disabledBackground}`,
-  },
+    {
+      borderLeft: `1px solid ${(t.vars || t).palette.action.disabledBackground}`,
+    },
 }))
 
 export const PROMPT_LABELS: Record<string, string> = {

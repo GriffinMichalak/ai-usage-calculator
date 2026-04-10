@@ -6,13 +6,23 @@ import Paper from '@mui/material/Paper'
 import { ThemeProvider } from '@mui/material/styles'
 import ToggleButton from '@mui/material/ToggleButton'
 import Typography from '@mui/material/Typography'
-import { MODEL_LABELS, PROMPT_LABELS, StyledToggleButtonGroup, theme, ToggleOption, toggleStackSx } from './extras'
+import {
+  MODEL_LABELS,
+  PROMPT_LABELS,
+  StyledToggleButtonGroup,
+  theme,
+  ToggleOption,
+  toggleStackSx,
+} from './extras'
 
 function App() {
   const [promptType, setPromptType] = useState<string | null>(null)
   const [modelType, setModelType] = useState<string | null>(null)
 
-  const handlePromptType = (_event: React.MouseEvent<HTMLElement>, newPromptType: string | null) => {
+  const handlePromptType = (
+    _event: React.MouseEvent<HTMLElement>,
+    newPromptType: string | null
+  ) => {
     setPromptType(newPromptType)
   }
 
@@ -20,13 +30,15 @@ function App() {
     setModelType(newModelType)
   }
 
-  const promptLabel = promptType ? PROMPT_LABELS[promptType] ?? promptType : null
-  const modelLabel = modelType ? MODEL_LABELS[modelType] ?? modelType : null
+  const promptLabel = promptType ? (PROMPT_LABELS[promptType] ?? promptType) : null
+  const modelLabel = modelType ? (MODEL_LABELS[modelType] ?? modelType) : null
 
   const canCalculate = Boolean(promptType && modelType)
+  const [displayResults, setDisplayResults] = useState<boolean>(false)
 
   const handleCalculate = () => {
     if (!canCalculate) return
+    setDisplayResults(true)
     // Wire up emissions calculation here
   }
 
@@ -36,15 +48,23 @@ function App() {
         <header className="app-hero">
           <h1 className="app-hero__title">AI Emissions Calculator</h1>
           <p className="app-hero__lede">
-            Choose how you use the model and what class of model you run. Estimates will appear below.
+            Choose how you use the model and what class of model you run. Estimates will appear
+            below.
           </p>
         </header>
 
         <div className="selection-grid">
-          <Paper className="selection-card" elevation={0} component="section" aria-labelledby="step-prompt-heading">
+          <Paper
+            className="selection-card"
+            elevation={0}
+            component="section"
+            aria-labelledby="step-prompt-heading"
+          >
             <span className="selection-card__step">Step 1</span>
             <h2 id="step-prompt-heading">Prompt type</h2>
-            <p className="selection-card__hint">What kind of task best matches your typical request?</p>
+            <p className="selection-card__hint">
+              What kind of task best matches your typical request?
+            </p>
             <div className="toggle-rows">
               <StyledToggleButtonGroup
                 value={promptType}
@@ -81,10 +101,17 @@ function App() {
             </div>
           </Paper>
 
-          <Paper className="selection-card" elevation={0} component="section" aria-labelledby="step-model-heading">
+          <Paper
+            className="selection-card"
+            elevation={0}
+            component="section"
+            aria-labelledby="step-model-heading"
+          >
             <span className="selection-card__step">Step 2</span>
             <h2 id="step-model-heading">Model</h2>
-            <p className="selection-card__hint">Rough size or capability tier of the model you use.</p>
+            <p className="selection-card__hint">
+              Rough size or capability tier of the model you use.
+            </p>
             <div className="toggle-rows">
               <StyledToggleButtonGroup
                 value={modelType}
@@ -106,13 +133,13 @@ function App() {
                 aria-label="Model tier, row two"
               >
                 <ToggleButton value="frontier-text" color="primary" sx={toggleStackSx}>
-                  <ToggleOption title="Frontier text" example="e.g., Claude Opus, GPT-4, Gemini Ultra" />
+                  <ToggleOption
+                    title="Frontier text"
+                    example="e.g., Claude Opus, GPT-4, Gemini Ultra"
+                  />
                 </ToggleButton>
                 <ToggleButton value="frontier-multimodal" color="primary" sx={toggleStackSx}>
-                  <ToggleOption
-                    title="Frontier multimodal"
-                    example="e.g., DALL-E 3, Midjourney"
-                  />
+                  <ToggleOption title="Frontier multimodal" example="e.g., DALL-E 3, Midjourney" />
                 </ToggleButton>
               </StyledToggleButtonGroup>
             </div>
@@ -121,8 +148,8 @@ function App() {
 
         <aside className="summary-bar" aria-live="polite">
           <Typography component="p" variant="body2" sx={{ m: 0, color: 'text.secondary' }}>
-            <strong>Prompt:</strong> {promptLabel ?? '—'} <span className="summary-bar__sep">·</span>{' '}
-            <strong>Model:</strong> {modelLabel ?? '—'}
+            <strong>Prompt:</strong> {promptLabel ?? '—'}{' '}
+            <span className="summary-bar__sep">·</span> <strong>Model:</strong> {modelLabel ?? '—'}
           </Typography>
         </aside>
 
@@ -145,9 +172,11 @@ function App() {
             Results
           </h2>
           <div className="outputs__panel">
-            <p className="outputs__placeholder">
-              Emissions and usage estimates will show here once you wire in your calculator logic.
-            </p>
+            {!displayResults ? (
+              <p className="outputs__placeholder">
+                Emissions and usage estimates will show here once you wire in your calculator logic.
+              </p>
+            ) : null}
           </div>
         </section>
       </div>
