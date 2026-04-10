@@ -3,75 +3,10 @@ import './App.scss'
 
 import Button from '@mui/material/Button'
 import Paper from '@mui/material/Paper'
-import { createTheme, ThemeProvider, styled } from '@mui/material/styles'
-import ToggleButton, { toggleButtonClasses } from '@mui/material/ToggleButton'
-import ToggleButtonGroup, { toggleButtonGroupClasses } from '@mui/material/ToggleButtonGroup'
+import { ThemeProvider } from '@mui/material/styles'
+import ToggleButton from '@mui/material/ToggleButton'
 import Typography from '@mui/material/Typography'
-
-const theme = createTheme({
-  palette: {
-    primary: { main: '#aa3bff' },
-    mode: 'light',
-  },
-  typography: {
-    fontFamily: 'Inter, "Helvetica Neue", Arial, sans-serif',
-  },
-})
-
-const toggleStackSx = {
-  textTransform: 'none' as const,
-  py: 1.25,
-  px: 1.5,
-  flexDirection: 'column' as const,
-  alignItems: 'flex-start',
-  textAlign: 'left',
-  gap: 0.35,
-  lineHeight: 1.35,
-}
-
-const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme: t }) => ({
-  flexWrap: 'wrap',
-  gap: '0.5rem',
-  justifyContent: 'flex-start',
-  [`& .${toggleButtonGroupClasses.firstButton}, & .${toggleButtonGroupClasses.middleButton}`]: {
-    borderTopRightRadius: (t.vars || t).shape.borderRadius,
-    borderBottomRightRadius: (t.vars || t).shape.borderRadius,
-  },
-  [`& .${toggleButtonGroupClasses.lastButton}, & .${toggleButtonGroupClasses.middleButton}`]: {
-    borderTopLeftRadius: (t.vars || t).shape.borderRadius,
-    borderBottomLeftRadius: (t.vars || t).shape.borderRadius,
-    borderLeft: `1px solid ${(t.vars || t).palette.divider}`,
-  },
-  [`& .${toggleButtonGroupClasses.lastButton}.${toggleButtonClasses.disabled}, & .${toggleButtonGroupClasses.middleButton}.${toggleButtonClasses.disabled}`]:
-  {
-    borderLeft: `1px solid ${(t.vars || t).palette.action.disabledBackground}`,
-  },
-}))
-
-const PROMPT_LABELS: Record<string, string> = {
-  'short-text': 'Short text query',
-  'long-text': 'Long text generation',
-  code: 'Code generation',
-  image: 'Image generation',
-  'multi-turn': 'Multi-turn conversation',
-  summary: 'Document summarization',
-}
-
-const MODEL_LABELS: Record<string, string> = {
-  lightweight: 'Lightweight',
-  'mid-size': 'Mid-size',
-  'frontier-text': 'Frontier text',
-  'frontier-multimodal': 'Frontier Multimodal',
-}
-
-function ToggleOption({ title, example }: { title: string; example?: string }) {
-  return (
-    <span className="toggle-option">
-      <span className="toggle-option__title">{title}</span>
-      {example ? <span className="toggle-option__example">{example}</span> : null}
-    </span>
-  )
-}
+import { MODEL_LABELS, PROMPT_LABELS, StyledToggleButtonGroup, theme, ToggleOption, toggleStackSx } from './extras'
 
 function App() {
   const [promptType, setPromptType] = useState<string | null>(null)
