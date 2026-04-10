@@ -1,119 +1,128 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
 import './App.scss'
 
+import ToggleButton, { toggleButtonClasses } from '@mui/material/ToggleButton'
+import ToggleButtonGroup, { toggleButtonGroupClasses } from '@mui/material/ToggleButtonGroup'
+import { styled } from '@mui/material/styles'
+
+const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+  gap: '2rem',
+  [`& .${toggleButtonGroupClasses.firstButton}, & .${toggleButtonGroupClasses.middleButton}`]: {
+    borderTopRightRadius: (theme.vars || theme).shape.borderRadius,
+    borderBottomRightRadius: (theme.vars || theme).shape.borderRadius,
+  },
+  [`& .${toggleButtonGroupClasses.lastButton}, & .${toggleButtonGroupClasses.middleButton}`]: {
+    borderTopLeftRadius: (theme.vars || theme).shape.borderRadius,
+    borderBottomLeftRadius: (theme.vars || theme).shape.borderRadius,
+    borderLeft: `1px solid ${(theme.vars || theme).palette.divider}`,
+  },
+  [`& .${toggleButtonGroupClasses.lastButton}.${toggleButtonClasses.disabled}, & .${toggleButtonGroupClasses.middleButton}.${toggleButtonClasses.disabled}`]:
+  {
+    borderLeft: `1px solid ${(theme.vars || theme).palette.action.disabledBackground}`,
+  },
+}))
+
 function App() {
-  const [count, setCount] = useState(0)
+  // const [count, setCount] = useState(0)
+  const [promptType, setPromptType] = useState<string | null>('')
+  const [modelType, setModelType] = useState<string | null>('')
+
+  const handlePromptType = (_event: React.MouseEvent<HTMLElement>, newPromptType: string | null) => {
+    setPromptType(newPromptType)
+  }
+
+  const handleModelType = (_event: React.MouseEvent<HTMLElement>, newModelType: string | null) => {
+    setModelType(newModelType)
+  }
 
   return (
     <>
       <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+          <h1>AI Emissions Calculator</h1>
+          {/* <p>Subtitle</p> */}
+          <br />
+          <br />
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      <div style={{ justifyContent: 'center', display: 'flex', gap: '5rem' }}>
+        <section id="prompt-select">
+          <div id="docs">
+            <h2>1. Select Prompt Type</h2>
+            <p>Your questions, answered</p>
+            <StyledToggleButtonGroup
+              value={promptType}
+              exclusive
+              onChange={handlePromptType}
+              aria-label="text promptType"
+            >
+              <ToggleButton value="short-text" aria-label="left aligned" style={{ textTransform: 'none' }}>
+                Short text query
+              </ToggleButton>
+              <ToggleButton value="long-text" aria-label="centered" style={{ textTransform: 'none' }}>
+                Long Text Gen.
+              </ToggleButton>
+              <ToggleButton value="code" aria-label="right aligned" style={{ textTransform: 'none' }}>
+                Code Gen.
+              </ToggleButton>
+            </StyledToggleButtonGroup>
+            <StyledToggleButtonGroup
+              value={promptType}
+              exclusive
+              onChange={handlePromptType}
+              aria-label="extra options"
+              style={{ marginTop: '0.5rem' }}
+            >
+              <ToggleButton value="image" aria-label="left aligned" style={{ textTransform: 'none' }}>
+                Image Gen.
+              </ToggleButton>
+              <ToggleButton value="multi-turn" aria-label="centered" style={{ textTransform: 'none' }}>
+                Multi-Turn
+              </ToggleButton>
+              <ToggleButton value="summary" aria-label="right aligned" style={{ textTransform: 'none' }}>
+                Summarizing
+              </ToggleButton>
+            </StyledToggleButtonGroup>
+          </div>
+        </section>
+        <section id="prompt-select">
+          <div id="docs">
+            <h2>2. Select Model</h2>
+            <p>Your questions, answered</p>
+            <StyledToggleButtonGroup
+              value={modelType}
+              exclusive
+              onChange={handleModelType}
+              aria-label="text modelType"
+            >
+              <ToggleButton value="lightweight" aria-label="left aligned" style={{ textTransform: 'none' }}>
+                Lightweight
+              </ToggleButton>
+              <ToggleButton value="mid-size" aria-label="centered" style={{ textTransform: 'none' }}>
+                Mid-Size
+              </ToggleButton>
+            </StyledToggleButtonGroup>
+            <StyledToggleButtonGroup
+              value={modelType}
+              exclusive
+              onChange={handleModelType}
+              aria-label="extra options"
+              style={{ marginTop: '0.5rem' }}
+            >
+              <ToggleButton value="frontier-text" aria-label="left aligned" style={{ textTransform: 'none' }}>
+                Frontier Text
+              </ToggleButton>
+              <ToggleButton value="frontier-image" aria-label="centered" style={{ textTransform: 'none' }}>
+                Frontier Image
+              </ToggleButton>
+            </StyledToggleButtonGroup>
+          </div>
+        </section>
+      </div>
+
+      <div>Prompt: {promptType}</div>
+      <div>Model: {modelType}</div>
     </>
   )
 }
