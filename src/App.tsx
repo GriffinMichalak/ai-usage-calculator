@@ -1,5 +1,5 @@
 import './App.scss'
-import { useState, type MouseEvent } from 'react'
+import { useState, useEffect, type MouseEvent } from 'react'
 
 import Box from '@mui/material/Box'
 import ToggleButton from '@mui/material/ToggleButton'
@@ -41,6 +41,7 @@ function App() {
   const [size, setSize] = useState<ModelSize>('medium')
   const canCalculate = Boolean(model) && Boolean(size)
   const [displayResults, setDisplayResults] = useState<Boolean>(false)
+  const [data, setData] = useState(null);
 
   const handleModelChange = (event: SelectChangeEvent<string | null>) => {
     const selectedModel = event.target.value
@@ -55,8 +56,16 @@ function App() {
     }
   }
 
+  useEffect(() => {
+    fetch('../data/data.json')
+      .then(res => res.json())
+      .then(json => setData(json))
+      .catch(err => console.error(err));
+  }, []);
+
   return (
     <Box sx={{ m: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <div>{data ? data[0].Model : 'Loading...'}</div>
       <Box>
         <Typography variant="subtitle2" sx={{ mb: 1 }}>
           Model Size
