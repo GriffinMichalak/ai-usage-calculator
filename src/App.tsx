@@ -1,186 +1,119 @@
-import { useState } from 'react'
 import './App.scss'
+import { useState, type MouseEvent } from 'react';
 
-import Button from '@mui/material/Button'
-import Paper from '@mui/material/Paper'
-import { ThemeProvider } from '@mui/material/styles'
+import Box from '@mui/material/Box'
 import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
-import {
-  MODEL_LABELS,
-  PROMPT_LABELS,
-  StyledToggleButtonGroup,
-  theme,
-  ToggleOption,
-  toggleStackSx,
-} from './extras'
+import InputLabel from '@mui/material/InputLabel'
+import FormControl from '@mui/material/FormControl'
+import Select from '@mui/material/Select';
+import type { SelectChangeEvent } from '@mui/material/Select';
+import Button from '@mui/material/Button';
+
+class AIModel {
+  id: string
+  name: string
+
+  constructor(id: string, name: string) {
+    this.id = id
+    this.name = name
+  }
+}
+
+const MODELS_OPENAI: AIModel[] = [
+  new AIModel('gpt-5-medium', 'GPT-5 (medium)'),
+  new AIModel('gpt-5-nano', 'GPT-5 nano (minimal)'),
+  new AIModel('gpt-5-mini', 'GPT-5 mini (medium)'),
+]
+
+const MODELS_ANTHROPIC: AIModel[] = [
+  new AIModel('claude-4-sonnet', "Claude 4 Sonnet"),
+  new AIModel('claude-4.5-haiku', "Claude 4.5 Haiku"),
+  new AIModel('claude-4.1-opus', "Claude 4.1 Opus"),
+  new AIModel('claude-4.5-sonnet', "Claude 4.5 Sonnet"),
+]
+
+type ModelSize = 'small' | 'medium' | 'large'
 
 function App() {
-  const [promptType, setPromptType] = useState<string | null>(null)
-  const [modelType, setModelType] = useState<string | null>(null)
+  const [model, setModel] = useState<string | null>('');
+  const [size, setSize] = useState<ModelSize>('medium');
+  const canCalculate = Boolean(model) && Boolean(size);
 
-  const handlePromptType = (
-    _event: React.MouseEvent<HTMLElement>,
-    newPromptType: string | null
-  ) => {
-    setPromptType(newPromptType)
-  }
+  const handleModelChange = (event: SelectChangeEvent<string | null>) => {
+    const selectedModel = event.target.value;
+    setModel(selectedModel);
+    console.log(selectedModel);
+  };
 
-  const handleModelType = (_event: React.MouseEvent<HTMLElement>, newModelType: string | null) => {
-    setModelType(newModelType)
-  }
-
-  const promptLabel = promptType ? (PROMPT_LABELS[promptType] ?? promptType) : null
-  const modelLabel = modelType ? (MODEL_LABELS[modelType] ?? modelType) : null
-
-  const canCalculate = Boolean(promptType && modelType)
-  const [displayResults, setDisplayResults] = useState<boolean>(false)
-
-  const handleCalculate = () => {
-    if (!canCalculate) return
-    setDisplayResults(true)
-    // Wire up emissions calculation here
-  }
+  const handleSizeChange = (_event: MouseEvent<HTMLElement>, newSize: ModelSize | null) => {
+    if (newSize) {
+      setSize(newSize);
+      console.log(newSize);
+    }
+  };
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className="app">
-        <header className="app-hero">
-          <h1 className="app-hero__title">AI Emissions Calculator</h1>
-          <p className="app-hero__lede">
-            Choose how you use the model and what class of model you run. Estimates will appear
-            below.
-          </p>
-        </header>
-
-        <div className="selection-grid">
-          <Paper
-            className="selection-card"
-            elevation={0}
-            component="section"
-            aria-labelledby="step-prompt-heading"
-          >
-            <span className="selection-card__step">Step 1</span>
-            <h2 id="step-prompt-heading">Prompt type</h2>
-            <p className="selection-card__hint">
-              What kind of task best matches your typical request?
-            </p>
-            <div className="toggle-rows">
-              <StyledToggleButtonGroup
-                value={promptType}
-                exclusive
-                onChange={handlePromptType}
-                aria-label="Prompt type, row one"
-              >
-                <ToggleButton value="short-text" color="primary" sx={toggleStackSx}>
-                  <ToggleOption title="Short text query" example="e.g., quick question" />
-                </ToggleButton>
-                <ToggleButton value="long-text" color="primary" sx={toggleStackSx}>
-                  <ToggleOption title="Long text generation" example="e.g., essay, report" />
-                </ToggleButton>
-                <ToggleButton value="code" color="primary" sx={toggleStackSx}>
-                  <ToggleOption title="Code generation" />
-                </ToggleButton>
-              </StyledToggleButtonGroup>
-              <StyledToggleButtonGroup
-                value={promptType}
-                exclusive
-                onChange={handlePromptType}
-                aria-label="Prompt type, row two"
-              >
-                <ToggleButton value="image" color="primary" sx={toggleStackSx}>
-                  <ToggleOption title="Image generation" />
-                </ToggleButton>
-                <ToggleButton value="multi-turn" color="primary" sx={toggleStackSx}>
-                  <ToggleOption title="Multi-turn conversation" example="per exchange" />
-                </ToggleButton>
-                <ToggleButton value="summary" color="primary" sx={toggleStackSx}>
-                  <ToggleOption title="Document summarization" />
-                </ToggleButton>
-              </StyledToggleButtonGroup>
-            </div>
-          </Paper>
-
-          <Paper
-            className="selection-card"
-            elevation={0}
-            component="section"
-            aria-labelledby="step-model-heading"
-          >
-            <span className="selection-card__step">Step 2</span>
-            <h2 id="step-model-heading">Model</h2>
-            <p className="selection-card__hint">
-              Rough size or capability tier of the model you use.
-            </p>
-            <div className="toggle-rows">
-              <StyledToggleButtonGroup
-                value={modelType}
-                exclusive
-                onChange={handleModelType}
-                aria-label="Model tier, row one"
-              >
-                <ToggleButton value="lightweight" color="primary" sx={toggleStackSx}>
-                  <ToggleOption title="Lightweight" example="e.g., Claude Haiku, GPT-3.5" />
-                </ToggleButton>
-                <ToggleButton value="mid-size" color="primary" sx={toggleStackSx}>
-                  <ToggleOption title="Mid-size" example="e.g., Claude Sonnet, GPT-4o mini" />
-                </ToggleButton>
-              </StyledToggleButtonGroup>
-              <StyledToggleButtonGroup
-                value={modelType}
-                exclusive
-                onChange={handleModelType}
-                aria-label="Model tier, row two"
-              >
-                <ToggleButton value="frontier-text" color="primary" sx={toggleStackSx}>
-                  <ToggleOption
-                    title="Frontier text"
-                    example="e.g., Claude Opus, GPT-4, Gemini Ultra"
-                  />
-                </ToggleButton>
-                <ToggleButton value="frontier-multimodal" color="primary" sx={toggleStackSx}>
-                  <ToggleOption title="Frontier multimodal" example="e.g., DALL-E 3, Midjourney" />
-                </ToggleButton>
-              </StyledToggleButtonGroup>
-            </div>
-          </Paper>
-        </div>
-
-        <aside className="summary-bar" aria-live="polite">
-          <Typography component="p" variant="body2" sx={{ m: 0, color: 'text.secondary' }}>
-            <strong>Prompt:</strong> {promptLabel ?? '—'}{' '}
-            <span className="summary-bar__sep">·</span> <strong>Model:</strong> {modelLabel ?? '—'}
-          </Typography>
-        </aside>
-
-        <div className="calculate-row">
-          <Button
-            type="button"
-            variant="contained"
-            color="primary"
-            size="large"
-            disabled={!canCalculate}
-            onClick={handleCalculate}
-            sx={{ textTransform: 'none', px: 4, py: 1.25, borderRadius: 999, fontWeight: 600 }}
-          >
-            Calculate
-          </Button>
-        </div>
-
-        <section className="outputs" aria-labelledby="outputs-heading">
-          <h2 id="outputs-heading" className="outputs__heading">
-            Results
-          </h2>
-          <div className="outputs__panel">
-            {!displayResults ? (
-              <p className="outputs__placeholder">
-                Emissions and usage estimates will show here once you wire in your calculator logic.
-              </p>
-            ) : null}
-          </div>
-        </section>
-      </div>
-    </ThemeProvider>
+    <Box sx={{ m: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box>
+        <Typography variant="subtitle2" sx={{ mb: 1 }}>
+          Model Size
+        </Typography>
+        <ToggleButtonGroup
+          color="primary"
+          value={size}
+          exclusive
+          onChange={handleSizeChange}
+          aria-label="model size"
+          sx={{ '& .MuiToggleButton-root': { textTransform: 'none' } }}
+        >
+          <ToggleButton value="small" aria-label="small size">
+            <Box sx={{ textAlign: 'left' }}>
+              <Typography variant="body2">Small</Typography>
+              <Typography variant="caption" color="text.secondary">Fastest / lowest cost</Typography>
+            </Box>
+          </ToggleButton>
+          <ToggleButton value="medium" aria-label="medium size">
+            <Box sx={{ textAlign: 'left' }}>
+              <Typography variant="body2">Medium</Typography>
+              <Typography variant="caption" color="text.secondary">Balanced performance</Typography>
+            </Box>
+          </ToggleButton>
+          <ToggleButton value="large" aria-label="large size">
+            <Box sx={{ textAlign: 'left' }}>
+              <Typography variant="body2">Large</Typography>
+              <Typography variant="caption" color="text.secondary">Best quality output</Typography>
+            </Box>
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+      <FormControl sx={{ minWidth: 240 }}>
+        <InputLabel htmlFor="grouped-native-select">AI Model</InputLabel>
+        <Select
+          native
+          id="grouped-native-select"
+          label="AI Model"
+          onChange={handleModelChange}
+          value={model}
+        >
+          <option aria-label="None" value="" />
+          <optgroup label="OpenAI">
+            {MODELS_OPENAI.map((m) => (
+              <option key={m.id} value={m.id}>{m.name}</option>
+            ))}
+          </optgroup>
+          <optgroup label="Anthropic">
+            {MODELS_ANTHROPIC.map((m) => (
+              <option key={m.id} value={m.id}>{m.name}</option>
+            ))}
+          </optgroup>
+        </Select>
+      </FormControl>
+      <Button variant="contained" disabled={!canCalculate}>
+        Calculate
+      </Button>
+    </Box>
   )
 }
 
