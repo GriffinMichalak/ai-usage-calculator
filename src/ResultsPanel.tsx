@@ -26,10 +26,17 @@ function formatNum(n: number, maxFractionDigits = 3) {
   return n.toLocaleString(undefined, { maximumFractionDigits: maxFractionDigits })
 }
 
+/** Rounded to nearest tenth for summary stats (1 decimal place max). */
+function formatTenth(n: number): string {
+  if (!Number.isFinite(n)) return '—'
+  const rounded = Math.round(n * 10) / 10
+  return rounded.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 })
+}
+
 function formatPlainRange(min: number, max: number, unit: string) {
   if (!Number.isFinite(min) || !Number.isFinite(max)) return '—'
-  const a = formatNum(min)
-  const b = formatNum(max)
+  const a = formatTenth(min)
+  const b = formatTenth(max)
   return `${a}–${b} ${unit}`
 }
 
@@ -69,26 +76,25 @@ function OneReplyStatCard({
         sx={{
           p: 2.5,
           display: 'flex',
-          gap: 2,
-          alignItems: 'flex-start',
+          flexDirection: 'column',
           '&:last-child': { pb: 2.5 },
         }}
       >
-        <Box
-          sx={(theme) => ({
-            width: 52,
-            height: 52,
-            borderRadius: 2,
-            display: 'grid',
-            placeItems: 'center',
-            flexShrink: 0,
-            bgcolor: alpha(theme.palette[tint].main, 0.18),
-            color: theme.palette[tint].main,
-          })}
-        >
-          <Icon sx={{ fontSize: 28 }} aria-hidden />
-        </Box>
-        <Box sx={{ minWidth: 0 }}>
+        <Stack direction="row" spacing={2} useFlexGap sx={{ alignItems: 'center' }}>
+          <Box
+            sx={(theme) => ({
+              width: 52,
+              height: 52,
+              borderRadius: 2,
+              display: 'grid',
+              placeItems: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(theme.palette[tint].main, 0.18),
+              color: theme.palette[tint].main,
+            })}
+          >
+            <Icon sx={{ fontSize: 28 }} aria-hidden />
+          </Box>
           <Typography
             variant="caption"
             color="text.secondary"
@@ -97,17 +103,29 @@ function OneReplyStatCard({
           >
             {label}
           </Typography>
-          <Typography
-            variant="h4"
-            component="p"
-            sx={{ mt: 0.75, mb: 0, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1.15 }}
-          >
-            {value}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1.25, lineHeight: 1.55 }}>
-            {children}
-          </Typography>
-        </Box>
+        </Stack>
+        <Typography
+          variant="h6"
+          component="p"
+          sx={{
+            mt: 2.25,
+            mb: 0,
+            pl: 0,
+            ml: 0,
+            fontWeight: 700,
+            fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1.2,
+          }}
+        >
+          {value}
+        </Typography>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ mt: 1.25, pl: 0, ml: 0, lineHeight: 1.55 }}
+        >
+          {children}
+        </Typography>
       </CardContent>
     </Card>
   )
