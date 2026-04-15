@@ -605,9 +605,10 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
                 color="text.secondary"
                 sx={{ mb: 2, maxWidth: 720, lineHeight: 1.55 }}
               >
-                Not a forecast — just a thought experiment. <strong>If</strong> this benchmark
-                applied to <strong>one billion</strong> similar prompts, the study’s yardsticks are
-                roughly like:
+                Every day, 2.5 billion queries are sent to ChatGPT alone. Not a forecast — just a
+                thought experiment. <strong>If</strong> this benchmark applied to{' '}
+                <strong>one billion</strong> similar prompts, the study’s yardsticks are roughly
+                like:
               </Typography>
               <Stack spacing={1.5}>
                 {scaleStories.map((item) => (
