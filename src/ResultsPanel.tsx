@@ -1,13 +1,24 @@
 import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
+import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined'
 import Box from '@mui/material/Box'
+import Co2OutlinedIcon from '@mui/icons-material/Co2Outlined'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
+import DirectionsCarOutlinedIcon from '@mui/icons-material/DirectionsCarOutlined'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import FlightTakeoffOutlinedIcon from '@mui/icons-material/FlightTakeoffOutlined'
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined'
+import { alpha } from '@mui/material/styles'
+import type { ReactNode } from 'react'
+import type { SvgIconComponent } from '@mui/icons-material'
 import type { EmissionsBenchmarkRow } from './types'
 
 function formatNum(n: number, maxFractionDigits = 3) {
@@ -27,6 +38,144 @@ function lengthLabel(length: string): string {
   if (length === 'Medium') return 'a medium-length question'
   if (length === 'Long') return 'a longer question'
   return length.toLowerCase()
+}
+
+type PaletteTint = 'primary' | 'secondary' | 'info' | 'warning' | 'success'
+
+function OneReplyStatCard({
+  icon: Icon,
+  tint,
+  label,
+  value,
+  children,
+}: {
+  icon: SvgIconComponent
+  tint: PaletteTint
+  label: string
+  value: string
+  children: ReactNode
+}) {
+  return (
+    <Card
+      variant="outlined"
+      sx={{
+        flex: '1 1 240px',
+        borderColor: 'divider',
+        bgcolor: (theme) => alpha(theme.palette[tint].main, 0.06),
+        boxShadow: 'none',
+      }}
+    >
+      <CardContent
+        sx={{
+          p: 2.5,
+          display: 'flex',
+          gap: 2,
+          alignItems: 'flex-start',
+          '&:last-child': { pb: 2.5 },
+        }}
+      >
+        <Box
+          sx={(theme) => ({
+            width: 52,
+            height: 52,
+            borderRadius: 2,
+            display: 'grid',
+            placeItems: 'center',
+            flexShrink: 0,
+            bgcolor: alpha(theme.palette[tint].main, 0.18),
+            color: theme.palette[tint].main,
+          })}
+        >
+          <Icon sx={{ fontSize: 28 }} aria-hidden />
+        </Box>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            component="p"
+            sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', m: 0 }}
+          >
+            {label}
+          </Typography>
+          <Typography
+            variant="h4"
+            component="p"
+            sx={{ mt: 0.75, mb: 0, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1.15 }}
+          >
+            {value}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1.25, lineHeight: 1.55 }}>
+            {children}
+          </Typography>
+        </Box>
+      </CardContent>
+    </Card>
+  )
+}
+
+function ScaleStoryCard({
+  icon: Icon,
+  tint,
+  title,
+  headline,
+  detail,
+}: {
+  icon: SvgIconComponent
+  tint: PaletteTint
+  title: string
+  headline: string
+  detail: string
+}) {
+  return (
+    <Card
+      variant="outlined"
+      sx={(theme) => ({
+        borderColor: 'divider',
+        bgcolor: alpha(theme.palette[tint].main, 0.05),
+        boxShadow: 'none',
+        borderLeftWidth: 4,
+        borderLeftStyle: 'solid',
+        borderLeftColor: theme.palette[tint].main,
+      })}
+    >
+      <CardContent
+        sx={{
+          display: 'flex',
+          gap: 2,
+          alignItems: 'flex-start',
+          py: 2,
+          px: 2.5,
+          '&:last-child': { pb: 2 },
+        }}
+      >
+        <Box
+          sx={(theme) => ({
+            width: 44,
+            height: 44,
+            borderRadius: '50%',
+            flexShrink: 0,
+            display: 'grid',
+            placeItems: 'center',
+            bgcolor: alpha(theme.palette[tint].main, 0.18),
+            color: theme.palette[tint].main,
+          })}
+        >
+          <Icon sx={{ fontSize: 24 }} aria-hidden />
+        </Box>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+            {title}
+          </Typography>
+          <Typography variant="body1" sx={{ mt: 0.75, fontWeight: 600, lineHeight: 1.45 }}>
+            {headline}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75, lineHeight: 1.55 }}>
+            {detail}
+          </Typography>
+        </Box>
+      </CardContent>
+    </Card>
+  )
 }
 
 function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
@@ -96,149 +245,111 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
   /** Ballpark: ~1 t CO₂e per long transatlantic flight per passenger (varies widely). */
   const flightsApprox = flightTons / 1
 
-  const scaleAnalogies = [
+  const scaleStories = [
     {
+      icon: HomeOutlinedIcon,
+      tint: 'warning' as const,
       title: 'Household electricity',
-      body: `The dataset’s “household energy” yardstick is **${formatNum(householdMwh)} MWh**. As a **very rough** picture, that’s on the order of **${formatNum(homesApprox, 0)}** typical homes’ electricity for a year (assuming ~10.5 MWh per home).`,
+      headline: `About ${formatNum(homesApprox, 0)} typical homes' electricity for a year`,
+      detail: `The benchmark's "household energy" yardstick is ${formatNum(householdMwh)} MWh. That uses ~10.5 MWh per home per year as a ballpark — real usage varies widely.`,
     },
     {
+      icon: WaterDropOutlinedIcon,
+      tint: 'info' as const,
       title: 'Drinking water',
-      body: `The “people’s drinking water” yardstick is **${formatNum(drinkingKl, 0)} m³** (about **${formatNum((drinkingKl * 1000) / 1e6, 2)} million liters**). Very roughly, that’s **${formatNum(peopleDrinkingApprox, 0)}** people’s drinking water for a year (assuming ~1,500 L per person).`,
+      headline: `About ${formatNum(peopleDrinkingApprox, 0)} people's drinking water for a year`,
+      detail: `The yardstick is ${formatNum(drinkingKl, 0)} thousand m³ (~${formatNum((drinkingKl * 1000) / 1e6, 2)} million liters), using ~1,500 L per person per year as a rough guide.`,
     },
     {
-      title: 'Car travel',
-      body: `The “gasoline car” yardstick is **${formatNum(carTons)}** metric tons CO₂e. Very roughly, that’s on the order of **${formatNum(carYearsApprox, 0)}** car-years of emissions (assuming ~4.6 tons per car per year).`,
+      icon: DirectionsCarOutlinedIcon,
+      tint: 'secondary' as const,
+      title: 'Car emissions',
+      headline: `On the order of ${formatNum(carYearsApprox, 0)} car-years of CO₂`,
+      detail: `The "gasoline car" yardstick is ${formatNum(carTons)} metric tons CO₂e, using ~4.6 tons per car per year as a rough comparison.`,
     },
     {
+      icon: FlightTakeoffOutlinedIcon,
+      tint: 'primary' as const,
       title: 'Long flights',
-      body: `The “Atlantic flight” yardstick is **${formatNum(flightTons)}** metric tons CO₂e. Very roughly, that’s on the order of **${formatNum(flightsApprox, 0)}** long flights per passenger (assuming ~1 ton CO₂e per flight; real flights vary a lot).`,
+      headline: `On the order of ${formatNum(flightsApprox, 0)} long flights (one passenger each)`,
+      detail: `The "Atlantic flight" yardstick is ${formatNum(flightTons)} metric tons CO₂e, using ~1 ton per long flight as a rough comparison.`,
     },
   ]
 
   return (
     <Stack spacing={3} sx={{ textAlign: 'left', mt: 1 }}>
       <Box>
-        <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: '0.12em', fontWeight: 600 }}>
-          Your estimate
-        </Typography>
-        <Typography variant="h5" component="h2" sx={{ mt: 0.5, fontWeight: 600 }}>
+        <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 0.5 }}>
+          <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: '0.12em', fontWeight: 600, m: 0 }}>
+            Your estimate
+          </Typography>
+          <Chip size="small" label="One AI reply" variant="outlined" sx={{ fontWeight: 600 }} />
+        </Stack>
+        <Typography variant="h5" component="h2" sx={{ mt: 0.5, fontWeight: 700 }}>
           {row.Model}
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 0.5, maxWidth: 560 }}>
-          For <strong>{lengthLabel(row.length)}</strong> in the benchmark data (about{' '}
-          <strong>{row['Query Length'].toLocaleString()} tokens</strong> — a rough size measure for the
-          prompt). One reply uses a small amount of power, water, and emissions; the cards below spell that
-          out in everyday units.
+        <Typography variant="body1" color="text.secondary" sx={{ mt: 1, maxWidth: 600, lineHeight: 1.6 }}>
+          Based on published benchmarks for <strong>{lengthLabel(row.length)}</strong>. The three cards below
+          translate power, climate impact, and cooling water into everyday amounts — each for a single answer,
+          not a whole conversation.
+        </Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block', maxWidth: 560 }}>
+          Technical note: the study sized prompts at about {row['Query Length'].toLocaleString()} tokens (a
+          common measure of text length for models).
         </Typography>
       </Box>
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} useFlexGap sx={{ flexWrap: 'wrap' }}>
-        <Card
-          variant="outlined"
-          sx={{
-            flex: '1 1 200px',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-            boxShadow: 'none',
-          }}
-        >
-          <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              Electricity for one reply
-            </Typography>
-            <Typography variant="h4" component="p" sx={{ mt: 1, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1.2 }}>
-              {formatPlainRange(minE, maxE, 'Wh')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
-              Watt-hours measure how much energy was used. For context, a single prompt here is far less
-              than running a microwave for a minute.
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card
-          variant="outlined"
-          sx={{
-            flex: '1 1 200px',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-            boxShadow: 'none',
-          }}
-        >
-          <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              Climate footprint (one reply)
-            </Typography>
-            <Typography variant="h4" component="p" sx={{ mt: 1, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1.2 }}>
-              {formatPlainRange(minC, maxC, 'g CO₂e')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
-              CO₂e (“carbon dioxide equivalent”) bundles different greenhouse gases into one number. A few
-              grams is a very small amount — think in the same general range as many quick online tasks.
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card
-          variant="outlined"
-          sx={{
-            flex: '1 1 200px',
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-            boxShadow: 'none',
-          }}
-        >
-          <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              Water at the data center (one reply)
-            </Typography>
-            <Typography variant="h4" component="p" sx={{ mt: 1, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1.2 }}>
-              {formatPlainRange(minW, maxW, 'mL')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
-              Milliliters of water used on-site for cooling and related operations — typically a few drops to
-              a sip’s worth for a single prompt.
-            </Typography>
-          </CardContent>
-        </Card>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} useFlexGap sx={{ flexWrap: 'wrap' }}>
+        <OneReplyStatCard icon={BoltOutlinedIcon} tint="warning" label="Electricity" value={formatPlainRange(minE, maxE, 'Wh')}>
+          Think “energy used.” One reply here is far less than running a microwave for a minute.
+        </OneReplyStatCard>
+        <OneReplyStatCard icon={Co2OutlinedIcon} tint="success" label="Climate footprint" value={formatPlainRange(minC, maxC, 'g CO₂e')}>
+          CO₂e adds up different greenhouse gases into one number. A few grams is tiny — similar in spirit to
+          many quick online tasks.
+        </OneReplyStatCard>
+        <OneReplyStatCard icon={WaterDropOutlinedIcon} tint="info" label="Cooling water (on-site)" value={formatPlainRange(minW, maxW, 'mL')}>
+          Water used at the data center for cooling — often in the ballpark of a few drops to a small sip per
+          reply.
+        </OneReplyStatCard>
       </Stack>
 
-      <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
-        These figures come from a published benchmark for this model and setup. Your real chats can be higher
-        or lower depending on length, how busy the service is, and where it runs.
-      </Typography>
+      <Box
+        sx={(theme) => ({
+          display: 'flex',
+          gap: 1.5,
+          p: 2,
+          borderRadius: 2,
+          bgcolor: alpha(theme.palette.info.main, 0.08),
+          border: '1px solid',
+          borderColor: alpha(theme.palette.info.main, 0.25),
+        })}
+      >
+        <InfoOutlinedIcon sx={{ color: 'info.main', flexShrink: 0, fontSize: 22, mt: 0.15 }} aria-hidden />
+        <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.55 }}>
+          These numbers come from one benchmark setup. Your real chats can land higher or lower depending on
+          how long they are, how busy the service is, and where it runs.
+        </Typography>
+      </Box>
 
       <Box>
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-          A “what if” at huge scale
+        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.5 }}>
+          What if everyone asked a billion times?
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, maxWidth: 720 }}>
-          It helps to picture scale. The comparisons below are <strong>not</strong> predictions — they only
-          ask: “If this exact benchmark applied to <strong>one billion</strong> similar prompts, what familiar
-          things would that be roughly like?”
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, maxWidth: 720, lineHeight: 1.55 }}>
+          Not a forecast — just a thought experiment.{' '}
+          <strong>If</strong> this benchmark applied to <strong>one billion</strong> similar prompts, the
+          study’s yardsticks are roughly like:
         </Typography>
         <Stack spacing={1.5}>
-          {scaleAnalogies.map((item) => (
-            <Card
+          {scaleStories.map((item) => (
+            <ScaleStoryCard
               key={item.title}
-              variant="outlined"
-              sx={{ borderColor: 'divider', bgcolor: 'action.hover', boxShadow: 'none' }}
-            >
-              <CardContent sx={{ py: 2, px: 2.5, '&:last-child': { pb: 2 } }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                  {item.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
-                  {item.body.split('**').map((chunk, i) =>
-                    i % 2 === 1 ? (
-                      <strong key={i} style={{ color: 'inherit', fontWeight: 700 }}>
-                        {chunk}
-                      </strong>
-                    ) : (
-                      <span key={i}>{chunk}</span>
-                    ),
-                  )}
-                </Typography>
-              </CardContent>
-            </Card>
+              icon={item.icon}
+              tint={item.tint}
+              title={item.title}
+              headline={item.headline}
+              detail={item.detail}
+            />
           ))}
         </Stack>
       </Box>
