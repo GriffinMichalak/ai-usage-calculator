@@ -74,7 +74,7 @@ const EPA_G_CO2E_PER_TREE_SEEDLING_YEAR = 0.06 * 1_000_000
 function epaDrivingLine(gCo2e: number): string {
   const miles = gCo2e / EPA_G_CO2E_PER_MILE_GAS_CAR
   if (!Number.isFinite(miles)) return '—'
-  if (miles < 0.002) {
+  if (miles < 1) {
     const ft = miles * 5280
     return `${formatAdaptiveSmall(ft)} feet driven by the average gasoline-powered passenger vehicle`
   }
@@ -84,6 +84,10 @@ function epaDrivingLine(gCo2e: number): string {
 function epaGasolineGallonsLine(gCo2e: number): string {
   const gal = gCo2e / EPA_G_CO2E_PER_GALLON_GASOLINE
   if (!Number.isFinite(gal)) return '—'
+  if (gal < 1) {
+    const cups = gal * 16
+    return `${formatAdaptiveSmall(cups)} cups of gasoline consumed (CO₂ from combustion)`
+  }
   return `${formatAdaptiveSmall(gal)} gallons of gasoline consumed (CO₂ from combustion)`
 }
 
@@ -96,6 +100,10 @@ function epaSmartphonesLine(gCo2e: number): string {
 function epaCoalLine(gCo2e: number): string {
   const lb = gCo2e / EPA_G_CO2E_PER_LB_COAL
   if (!Number.isFinite(lb)) return '—'
+  if (lb < 1) {
+    const oz = lb * 16
+    return `${formatAdaptiveSmall(oz)} oz of coal burned at power plants (typical U.S. factor)`
+  }
   return `${formatAdaptiveSmall(lb)} pounds of coal burned at power plants (typical U.S. factor)`
 }
 
@@ -409,7 +417,7 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
       tint: 'warning' as const,
       title: 'Household electricity',
       headline: `About ${formatNum(homesApprox, 0)} typical homes' electricity for a year`,
-      detail: `The benchmark's "household energy" yardstick is ${formatNum(householdMwh)} MWh. That uses ~10.5 MWh per home per year as a ballpark — real usage varies widely.`,
+      detail: `The benchmark's "household energy" yardstick is ${formatNum(householdMwh)} MWh. That uses ~10.5 MWh per home per year as an estimate, though real usage varies.`,
     },
     {
       icon: WaterDropOutlinedIcon,
@@ -523,7 +531,7 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
               label="Electricity"
               value={formatPlainRange(minE, maxE, 'Wh')}
             >
-              Think “energy used.” One reply here is far less than running a microwave for a minute.
+              Energy used for this query. For reference, one Google search is ~0.3 Wh.
             </OneReplyStatCard>
             <OneReplyStatCard
               icon={Co2OutlinedIcon}
@@ -531,8 +539,8 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
               label="Climate footprint"
               value={formatPlainRange(minC, maxC, 'g CO₂e')}
             >
-              CO₂e adds up different greenhouse gases into one number. A few grams is tiny — similar
-              in spirit to many quick online tasks.
+              CO₂e adds up different greenhouse gases into one number. A Google search is ~0.2 g
+              CO₂e
             </OneReplyStatCard>
             <OneReplyStatCard
               icon={WaterDropOutlinedIcon}
@@ -540,8 +548,8 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
               label="Cooling water (on-site)"
               value={formatPlainRange(minW, maxW, 'mL')}
             >
-              Water used at the data center for cooling — often in the ballpark of a few drops to a
-              small sip per reply.
+              The water used at the data center for cooling. Typically, a reply ranges from a few
+              drops to a small sip.
             </OneReplyStatCard>
           </Stack>
 
@@ -595,9 +603,7 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
               aria-controls="billion-prompts-details"
               id="billion-prompts-header"
             >
-              <Typography sx={{ fontWeight: 700 }}>
-                What if everyone asked a billion times?
-              </Typography>
+              <Typography sx={{ fontWeight: 700 }}>What if I did this 1 billion times?</Typography>
             </AccordionSummary>
             <AccordionDetails sx={{ pt: 0, px: 2, pb: 2 }}>
               <Typography
@@ -605,10 +611,9 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
                 color="text.secondary"
                 sx={{ mb: 2, maxWidth: 720, lineHeight: 1.55 }}
               >
-                Every day, 2.5 billion queries are sent to ChatGPT alone. Not a forecast — just a
-                thought experiment. <strong>If</strong> this benchmark applied to{' '}
-                <strong>one billion</strong> similar prompts, the study’s yardsticks are roughly
-                like:
+                Every day, billions of queries are sent to ChatGPT and Claude. So while one AI
+                prompt may be harmless, observe the impact of <strong>1000000000 people</strong>{' '}
+                doing it every day.
               </Typography>
               <Stack spacing={1.5}>
                 {scaleStories.map((item) => (

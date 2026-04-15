@@ -126,16 +126,15 @@ function App() {
             component="h1"
             sx={{ fontSize: { xs: '2rem', sm: '2.75rem' }, lineHeight: 1.15 }}
           >
-            How much energy does one AI answer use?
+            How much energy was used for my AI response?
           </Typography>
           <Typography
             variant="body1"
             color="text.secondary"
             sx={{ maxWidth: 640, lineHeight: 1.65 }}
           >
-            Pick the kind of AI and roughly how long your question is. We’ll show electricity,
-            climate impact, and water in units most people recognize — plus optional technical
-            detail if you want to dig in.
+            Pick the kind of AI and roughly how long your question was, and below you'll see the
+            electricity, climate impact, and water usage to generate the reply.
           </Typography>
         </Stack>
 
@@ -151,8 +150,7 @@ function App() {
                   Step 1 — How long is your question?
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, maxWidth: 560 }}>
-                  Shorter prompts usually use less compute; longer ones can cost a bit more time,
-                  energy, and emissions. Choose the closest match.
+                  Choose the closest match
                 </Typography>
                 <ToggleButtonGroup
                   color="primary"
@@ -189,7 +187,7 @@ function App() {
                         variant="caption"
                         sx={{ display: 'block', opacity: 0.9, mt: 0.25 }}
                       >
-                        Quick question — usually fastest and lightest
+                        A quick question (~75 words)
                       </Typography>
                     </Box>
                   </ToggleButton>
@@ -202,7 +200,7 @@ function App() {
                         variant="caption"
                         sx={{ display: 'block', opacity: 0.9, mt: 0.25 }}
                       >
-                        A few paragraphs or a detailed ask
+                        A few paragraphs (~750 words)
                       </Typography>
                     </Box>
                   </ToggleButton>
@@ -215,7 +213,7 @@ function App() {
                         variant="caption"
                         sx={{ display: 'block', opacity: 0.9, mt: 0.25 }}
                       >
-                        Long prompt or you need the best-quality answer
+                        A lengthy prompt (~7500 words)
                       </Typography>
                     </Box>
                   </ToggleButton>
