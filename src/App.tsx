@@ -1,5 +1,5 @@
 import './App.scss'
-import { useState, useEffect, type MouseEvent } from 'react'
+import { useState, useEffect, useRef, type MouseEvent } from 'react'
 import ResultsPanel from './ResultsPanel'
 
 import Alert from '@mui/material/Alert'
@@ -29,11 +29,12 @@ function lengthKeyFromSize(size: ModelSize): 'Short' | 'Medium' | 'Long' | null 
 }
 
 function App() {
-  const [model, setModel] = useState<string | null>('')
+  const [model, setModel] = useState<string | null>('GPT-5 (medium)')
   const [size, setSize] = useState<ModelSize>()
   const [resultRow, setResultRow] = useState<EmissionsBenchmarkRow | null>(null)
   const [resultError, setResultError] = useState<string | null>(null)
   const [data, setData] = useState<EmissionsBenchmarkRow[] | null>(null)
+  const resultsRef = useRef<HTMLDivElement | null>(null)
 
   const handleModelChange = (event: SelectChangeEvent<string | null>) => {
     const selectedModel = event.target.value
@@ -82,6 +83,14 @@ function App() {
       .then((json: EmissionsBenchmarkRow[]) => setData(json))
       .catch((err) => console.error(err))
   }, [])
+
+  useEffect(() => {
+    if (!resultRow) return
+    const timer = window.setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 50)
+    return () => window.clearTimeout(timer)
+  }, [resultRow])
 
   const canSubmit = Boolean(model && size && data?.length)
 
@@ -264,12 +273,14 @@ function App() {
           </CardContent>
         </Card>
 
-        {resultError ? (
-          <Alert severity="warning" sx={{ textAlign: 'left', borderRadius: 2, mb: 2 }}>
-            {resultError}
-          </Alert>
-        ) : null}
-        {resultRow ? <ResultsPanel row={resultRow} /> : null}
+        <Box ref={resultsRef}>
+          {resultError ? (
+            <Alert severity="warning" sx={{ textAlign: 'left', borderRadius: 2, mb: 2 }}>
+              {resultError}
+            </Alert>
+          ) : null}
+          {resultRow ? <ResultsPanel row={resultRow} /> : null}
+        </Box>
       </Container>
     </Box>
   )
