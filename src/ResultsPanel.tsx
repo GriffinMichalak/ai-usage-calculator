@@ -10,11 +10,16 @@ import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import DirectionsCarOutlinedIcon from '@mui/icons-material/DirectionsCarOutlined'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ForestOutlinedIcon from '@mui/icons-material/ForestOutlined'
 import FlightTakeoffOutlinedIcon from '@mui/icons-material/FlightTakeoffOutlined'
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import Link from '@mui/material/Link'
+import LocalFireDepartmentOutlinedIcon from '@mui/icons-material/LocalFireDepartmentOutlined'
+import LocalGasStationOutlinedIcon from '@mui/icons-material/LocalGasStationOutlined'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import SmartphoneOutlinedIcon from '@mui/icons-material/SmartphoneOutlined'
 import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined'
 import { alpha } from '@mui/material/styles'
 import type { ReactNode } from 'react'
@@ -33,11 +38,130 @@ function formatTenth(n: number): string {
   return rounded.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 })
 }
 
+/** Keeps tiny EPA-equivalence values readable instead of showing as 0. */
+function formatAdaptiveSmall(n: number): string {
+  if (!Number.isFinite(n)) return '—'
+  const abs = Math.abs(n)
+  if (abs >= 10) return formatNum(n, 1)
+  if (abs >= 1) return formatNum(n, 2)
+  if (abs >= 0.1) return formatNum(n, 3)
+  if (abs >= 0.01) return formatNum(n, 4)
+  return formatNum(n, 6)
+}
+
 function formatPlainRange(min: number, max: number, unit: string) {
   if (!Number.isFinite(min) || !Number.isFinite(max)) return '—'
   const a = formatTenth(min)
   const b = formatTenth(max)
   return `${a}–${b} ${unit}`
+}
+
+/**
+ * Factors from the U.S. EPA Greenhouse Gas Equivalencies Calculator (national defaults, 2022 grid / vehicle
+ * averages where applicable). Values are grams CO₂e implied per one unit of the activity.
+ *
+ * @see https://www.epa.gov/energy/ghg-equivalencies-calculator-calculations-and-references
+ */
+const EPA_G_CO2E_PER_MILE_GAS_CAR = 3.93e-4 * 1_000_000 // metric tons CO₂e/mile → g
+const EPA_G_CO2E_PER_GALLON_GASOLINE = 8887
+const EPA_G_CO2E_PER_SMARTPHONE_CHARGE = 1.24e-5 * 1_000_000 // g per charge
+const EPA_G_CO2E_PER_LB_COAL = 9.0e-4 * 1_000_000 // g per lb power-sector coal
+/** CO₂ sequestered by one average urban tree seedling per year (10-year avg, after planting). */
+const EPA_G_CO2E_PER_TREE_SEEDLING_YEAR = 0.06 * 1_000_000
+
+function epaDrivingLine(gCo2e: number): string {
+  const miles = gCo2e / EPA_G_CO2E_PER_MILE_GAS_CAR
+  if (!Number.isFinite(miles)) return '—'
+  if (miles < 0.002) {
+    const ft = miles * 5280
+    return `${formatAdaptiveSmall(ft)} feet driven by the average gasoline-powered passenger vehicle`
+  }
+  return `${formatAdaptiveSmall(miles)} miles driven by the average gasoline-powered passenger vehicle`
+}
+
+function epaGasolineGallonsLine(gCo2e: number): string {
+  const gal = gCo2e / EPA_G_CO2E_PER_GALLON_GASOLINE
+  if (!Number.isFinite(gal)) return '—'
+  return `${formatAdaptiveSmall(gal)} gallons of gasoline consumed (CO₂ from combustion)`
+}
+
+function epaSmartphonesLine(gCo2e: number): string {
+  const n = gCo2e / EPA_G_CO2E_PER_SMARTPHONE_CHARGE
+  if (!Number.isFinite(n)) return '—'
+  return `${formatAdaptiveSmall(n)} smartphone charges (electricity at U.S. grid average)`
+}
+
+function epaCoalLine(gCo2e: number): string {
+  const lb = gCo2e / EPA_G_CO2E_PER_LB_COAL
+  if (!Number.isFinite(lb)) return '—'
+  return `${formatAdaptiveSmall(lb)} pounds of coal burned at power plants (typical U.S. factor)`
+}
+
+function epaTreeLine(gCo2e: number): string {
+  const treeYears = gCo2e / EPA_G_CO2E_PER_TREE_SEEDLING_YEAR
+  if (!Number.isFinite(treeYears)) return '—'
+  if (treeYears < 0.01) {
+    return `${(treeYears * 100).toFixed(3)}% of one urban tree seedling year's average CO₂ uptake (EPA, ~60 kg CO₂/yr)`
+  }
+  return `${formatAdaptiveSmall(treeYears)} years of average CO₂ uptake for one urban tree seedling (EPA)`
+}
+
+function EpaEquivalencesCallout({ gCo2eMid }: { gCo2eMid: number }) {
+  const rows: { id: string; Icon: SvgIconComponent; text: string }[] = [
+    { id: 'miles', Icon: DirectionsCarOutlinedIcon, text: epaDrivingLine(gCo2eMid) },
+    { id: 'gas', Icon: LocalGasStationOutlinedIcon, text: epaGasolineGallonsLine(gCo2eMid) },
+    { id: 'phone', Icon: SmartphoneOutlinedIcon, text: epaSmartphonesLine(gCo2eMid) },
+    { id: 'coal', Icon: LocalFireDepartmentOutlinedIcon, text: epaCoalLine(gCo2eMid) },
+    { id: 'trees', Icon: ForestOutlinedIcon, text: epaTreeLine(gCo2eMid) },
+  ]
+
+  return (
+    <Box
+      sx={(theme) => ({
+        borderRadius: 2,
+        border: '1px solid',
+        borderColor: 'divider',
+        p: 2,
+        bgcolor: alpha(theme.palette.success.main, 0.06),
+      })}
+    >
+      <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
+        EPA-style equivalents (climate footprint)
+      </Typography>
+      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5, lineHeight: 1.5 }}>
+        Same order of magnitude of CO₂e as about the following — using the{' '}
+        <strong>midpoint</strong> of your min–max ({formatTenth(gCo2eMid)} g CO₂e). Method matches the U.S. EPA{' '}
+        <Link
+          href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator"
+          target="_blank"
+          rel="noopener noreferrer"
+          underline="hover"
+        >
+          Greenhouse Gas Equivalencies Calculator
+        </Link>{' '}
+        (
+        <Link
+          href="https://www.epa.gov/energy/ghg-equivalencies-calculator-calculations-and-references"
+          target="_blank"
+          rel="noopener noreferrer"
+          underline="hover"
+        >
+          calculations & references
+        </Link>
+        ).
+      </Typography>
+      <Stack spacing={1.25}>
+        {rows.map(({ id, Icon, text }) => (
+          <Stack key={id} direction="row" spacing={1.25} useFlexGap sx={{ alignItems: 'flex-start' }}>
+            <Icon sx={{ fontSize: 20, color: 'success.main', flexShrink: 0, mt: 0.15 }} aria-hidden />
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.55 }}>
+              {text}
+            </Typography>
+          </Stack>
+        ))}
+      </Stack>
+    </Box>
+  )
 }
 
 function lengthLabel(length: string): string {
@@ -330,6 +454,10 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
           reply.
         </OneReplyStatCard>
       </Stack>
+
+      {Number.isFinite(minC) && Number.isFinite(maxC) && (
+        <EpaEquivalencesCallout gCo2eMid={(minC + maxC) / 2} />
+      )}
 
       <Box
         sx={(theme) => ({
