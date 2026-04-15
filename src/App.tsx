@@ -133,7 +133,7 @@ function App() {
             color="text.secondary"
             sx={{ maxWidth: 640, lineHeight: 1.65 }}
           >
-            Pick the kind of AI and roughly how long your question was, and below you'll see the
+            Select how long your question was and the model you used. Below you'll see the
             electricity, climate impact, and water usage to generate the reply.
           </Typography>
         </Stack>
@@ -251,9 +251,9 @@ function App() {
                     ))}
                   </optgroup>
                 </Select>
-                <FormHelperText id="model-helper">
+                {/* <FormHelperText id="model-helper">
                   Same tool you pick in the app menu — we match it to published benchmark data.
-                </FormHelperText>
+                </FormHelperText> */}
               </FormControl>
 
               <Box>

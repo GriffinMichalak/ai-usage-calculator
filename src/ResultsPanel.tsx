@@ -136,15 +136,15 @@ function EpaEquivalencesCallout({ gCo2eMid }: { gCo2eMid: number }) {
       })}
     >
       <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
-        EPA-style equivalents (climate footprint)
+        Climate Footprint (From EPA)
       </Typography>
       <Typography
         variant="caption"
         color="text.secondary"
         sx={{ display: 'block', mb: 1.5, lineHeight: 1.5 }}
       >
-        Same order of magnitude of CO₂e as about the following — using the <strong>midpoint</strong>{' '}
-        of your min–max ({formatTenth(gCo2eMid)} g CO₂e). Method matches the U.S. EPA{' '}
+        Same order of magnitude of CO₂e as the following — using the <strong>midpoint</strong> of
+        your min-max ({formatTenth(gCo2eMid)} g CO₂e). Method matches the U.S. EPA{' '}
         <Link
           href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator"
           target="_blank"
@@ -476,10 +476,8 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
           color="text.secondary"
           sx={{ mt: 1, maxWidth: 600, lineHeight: 1.6 }}
         >
-          Based on the <strong>"How Hungry is AI?"</strong> benchmark paper for{' '}
-          <strong>{lengthLabel(row.length)}</strong>. The three cards below translate power, climate
-          impact, and cooling water into everyday amounts — each for a single answer, not a whole
-          conversation.
+          Below is the power, climate impact, and cooling water used for your prompt based on the{' '}
+          "How Hungry is AI?" benchmark paper for <strong>{lengthLabel(row.length)}</strong>.
         </Typography>
         <Typography
           variant="caption"
@@ -502,8 +500,10 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
           color="text.secondary"
           sx={{ mt: 1, display: 'block', maxWidth: 560 }}
         >
-          Technical note: the study sized prompts at about {row['Query Length'].toLocaleString()}{' '}
-          tokens (a common measure of text length for models).
+          <i>
+            Technical note: the study sized prompts at about {row['Query Length'].toLocaleString()}{' '}
+            tokens (a common measure of text length for models).
+          </i>
         </Typography>
       </Box>
 
@@ -730,8 +730,8 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
               </Typography>
               <Stack spacing={1}>
                 <Typography variant="body2" color="text.secondary">
-                  <strong>1) Benchmark lookup:</strong> We match your selected model + prompt length
-                  to one row in the dataset published in{' '}
+                  <strong>1. Lookup:</strong> We match your selected model & prompt length to one
+                  row in the dataset published in{' '}
                   <Link
                     href="https://arxiv.org/abs/2505.09598"
                     target="_blank"
@@ -743,16 +743,16 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
                   .
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  <strong>2) Per-reply ranges:</strong> That row provides min/max values for energy
-                  (Wh), climate footprint (gCO₂e), and water (mL). We show those ranges directly.
+                  <strong>2. Per-reply ranges:</strong> The selected row provides min/max values for
+                  energy (Wh), climate footprint (gCO₂e), and water (mL)
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  <strong>3) Scale-up stories:</strong> We convert the same row to “1 billion
+                  <strong>3. Scale-up stories:</strong> We convert the same row to “1 billion
                   prompts” and then map those totals into household, driving, flight, and water
-                  analogies for easier interpretation.
+                  analogies for easier understanding.
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  <strong>4) EPA equivalents:</strong> For climate context, we also convert the
+                  <strong>4. EPA equivalents:</strong> For climate context, we also convert the
                   midpoint of your carbon range ({formatTenth(carbonMid)} g CO₂e) using EPA
                   equivalency factors.
                 </Typography>
@@ -763,7 +763,7 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
           <Card variant="outlined" sx={{ borderColor: 'divider', boxShadow: 'none' }}>
             <CardContent sx={{ p: 2.5 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
-                Core formulas used in this report
+                Formulas Used
               </Typography>
               <Stack spacing={1}>
                 <Typography variant="body2" color="text.secondary">
@@ -793,33 +793,6 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
             </CardContent>
           </Card>
 
-          <Card variant="outlined" sx={{ borderColor: 'divider', boxShadow: 'none' }}>
-            <CardContent sx={{ p: 2.5 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
-                Why this matters
-              </Typography>
-              <Stack spacing={1}>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Decision quality:</strong> Seeing tradeoffs in energy, water, and
-                  emissions helps teams pick models and prompt patterns more intentionally.
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Responsible scaling:</strong> Small per-reply impacts can become very
-                  large at product scale; the 1B-prompt view makes that visible early.
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Transparent communication:</strong> Everyday equivalences make technical
-                  sustainability data understandable for non-specialists.
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Continuous improvement:</strong> Once impacts are measurable, you can
-                  track changes from model choice, caching, prompt shortening, and infrastructure
-                  shifts.
-                </Typography>
-              </Stack>
-            </CardContent>
-          </Card>
-
           <Box
             sx={(theme) => ({
               display: 'flex',
@@ -836,8 +809,8 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
               aria-hidden
             />
             <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.55 }}>
-              This report is intended for transparency and planning, not exact accounting. Results
-              vary by data center, hardware, utilization, model version, and output length.
+              These calculations are estimates only. Results may vary by data center, hardware,
+              utilization, model version, and output length.
             </Typography>
           </Box>
         </Stack>
