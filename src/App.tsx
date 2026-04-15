@@ -78,10 +78,20 @@ function App() {
   }
 
   useEffect(() => {
-    fetch('../data/data.json')
-      .then((res) => res.json())
+    const url = `${import.meta.env.BASE_URL}data/data.json`
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to load benchmark data (${res.status} ${res.statusText})`)
+        }
+        return res.json()
+      })
       .then((json: EmissionsBenchmarkRow[]) => setData(json))
-      .catch((err) => console.error(err))
+      .catch((err) => {
+        console.error(err)
+        setData([])
+        setResultError('Could not load benchmark data. Please refresh and try again.')
+      })
   }, [])
 
   useEffect(() => {
@@ -109,7 +119,7 @@ function App() {
             variant="overline"
             sx={{ color: 'primary.main', fontWeight: 700, letterSpacing: '0.14em' }}
           >
-            Plain-language estimates
+            Usage Calculator
           </Typography>
           <Typography
             variant="h1"
