@@ -66,7 +66,9 @@ function App() {
 
     if (!foundRow) {
       setResultRow(null)
-      setResultError(`We don’t have a benchmark row for “${modelName}” with that prompt length yet.`)
+      setResultError(
+        `We don’t have a benchmark row for “${modelName}” with that prompt length yet.`
+      )
       return
     }
 
@@ -84,7 +86,14 @@ function App() {
   const canSubmit = Boolean(model && size && data?.length)
 
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100%', py: { xs: 3, md: 5 }, px: { xs: 2, sm: 2 } }}>
+    <Box
+      sx={{
+        bgcolor: 'background.default',
+        minHeight: '100%',
+        py: { xs: 3, md: 5 },
+        px: { xs: 2, sm: 2 },
+      }}
+    >
       <Container maxWidth="md" sx={{ textAlign: 'left' }}>
         <Stack spacing={1} sx={{ mb: 3 }}>
           <Typography
@@ -93,12 +102,21 @@ function App() {
           >
             Plain-language estimates
           </Typography>
-          <Typography variant="h1" component="h1" sx={{ fontSize: { xs: '2rem', sm: '2.75rem' }, lineHeight: 1.15 }}>
+          <Typography
+            variant="h1"
+            component="h1"
+            sx={{ fontSize: { xs: '2rem', sm: '2.75rem' }, lineHeight: 1.15 }}
+          >
             How much energy does one AI answer use?
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 640, lineHeight: 1.65 }}>
-            Pick the kind of AI and roughly how long your question is. We’ll show electricity, climate impact,
-            and water in units most people recognize — plus optional technical detail if you want to dig in.
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ maxWidth: 640, lineHeight: 1.65 }}
+          >
+            Pick the kind of AI and roughly how long your question is. We’ll show electricity,
+            climate impact, and water in units most people recognize — plus optional technical
+            detail if you want to dig in.
           </Typography>
         </Stack>
 
@@ -106,12 +124,16 @@ function App() {
           <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
             <Stack spacing={3}>
               <Box>
-                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5, fontWeight: 600 }}>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  sx={{ mb: 0.5, fontWeight: 600 }}
+                >
                   Step 1 — How long is your question?
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, maxWidth: 560 }}>
-                  Shorter prompts usually use less compute; longer ones can cost a bit more time, energy, and
-                  emissions. Choose the closest match.
+                  Shorter prompts usually use less compute; longer ones can cost a bit more time,
+                  energy, and emissions. Choose the closest match.
                 </Typography>
                 <ToggleButtonGroup
                   color="primary"
@@ -144,7 +166,10 @@ function App() {
                       <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                         Short
                       </Typography>
-                      <Typography variant="caption" sx={{ display: 'block', opacity: 0.9, mt: 0.25 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ display: 'block', opacity: 0.9, mt: 0.25 }}
+                      >
                         Quick question — usually fastest and lightest
                       </Typography>
                     </Box>
@@ -154,7 +179,10 @@ function App() {
                       <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                         Medium
                       </Typography>
-                      <Typography variant="caption" sx={{ display: 'block', opacity: 0.9, mt: 0.25 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ display: 'block', opacity: 0.9, mt: 0.25 }}
+                      >
                         A few paragraphs or a detailed ask
                       </Typography>
                     </Box>
@@ -164,7 +192,10 @@ function App() {
                       <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                         Long
                       </Typography>
-                      <Typography variant="caption" sx={{ display: 'block', opacity: 0.9, mt: 0.25 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ display: 'block', opacity: 0.9, mt: 0.25 }}
+                      >
                         Long prompt or you need the best-quality answer
                       </Typography>
                     </Box>
@@ -220,7 +251,11 @@ function App() {
                   Show me the estimate
                 </Button>
                 {!data?.length ? (
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: 'block', mt: 1 }}
+                  >
                     Loading benchmark data…
                   </Typography>
                 ) : null}

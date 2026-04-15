@@ -18,11 +18,13 @@ import Link from '@mui/material/Link'
 import LocalFireDepartmentOutlinedIcon from '@mui/icons-material/LocalFireDepartmentOutlined'
 import LocalGasStationOutlinedIcon from '@mui/icons-material/LocalGasStationOutlined'
 import Stack from '@mui/material/Stack'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
 import SmartphoneOutlinedIcon from '@mui/icons-material/SmartphoneOutlined'
 import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined'
 import { alpha } from '@mui/material/styles'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode, type SyntheticEvent } from 'react'
 import type { SvgIconComponent } from '@mui/icons-material'
 import type { EmissionsBenchmarkRow } from './types'
 
@@ -128,9 +130,13 @@ function EpaEquivalencesCallout({ gCo2eMid }: { gCo2eMid: number }) {
       <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
         EPA-style equivalents (climate footprint)
       </Typography>
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5, lineHeight: 1.5 }}>
-        Same order of magnitude of CO₂e as about the following — using the{' '}
-        <strong>midpoint</strong> of your min–max ({formatTenth(gCo2eMid)} g CO₂e). Method matches the U.S. EPA{' '}
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ display: 'block', mb: 1.5, lineHeight: 1.5 }}
+      >
+        Same order of magnitude of CO₂e as about the following — using the <strong>midpoint</strong>{' '}
+        of your min–max ({formatTenth(gCo2eMid)} g CO₂e). Method matches the U.S. EPA{' '}
         <Link
           href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator"
           target="_blank"
@@ -152,8 +158,17 @@ function EpaEquivalencesCallout({ gCo2eMid }: { gCo2eMid: number }) {
       </Typography>
       <Stack spacing={1.25}>
         {rows.map(({ id, Icon, text }) => (
-          <Stack key={id} direction="row" spacing={1.25} useFlexGap sx={{ alignItems: 'flex-start' }}>
-            <Icon sx={{ fontSize: 20, color: 'success.main', flexShrink: 0, mt: 0.15 }} aria-hidden />
+          <Stack
+            key={id}
+            direction="row"
+            spacing={1.25}
+            useFlexGap
+            sx={{ alignItems: 'flex-start' }}
+          >
+            <Icon
+              sx={{ fontSize: 20, color: 'success.main', flexShrink: 0, mt: 0.15 }}
+              aria-hidden
+            />
             <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.55 }}>
               {text}
             </Typography>
@@ -321,6 +336,7 @@ function ScaleStoryCard({
 }
 
 function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
+  const [activeTab, setActiveTab] = useState(0)
   const minE = row['Mean Min Energy (Wh)']
   const maxE = row['Mean Max Energy (Wh)']
   const minC = row['Mean Min Carbon (gCO2e)']
@@ -418,11 +434,28 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
     },
   ]
 
+  const carbonMid = (minC + maxC) / 2
+  const energyMid = (minE + maxE) / 2
+  const waterMid = (minW + maxW) / 2
+
+  const handleTabChange = (_event: SyntheticEvent, nextTab: number) => {
+    setActiveTab(nextTab)
+  }
+
   return (
     <Stack spacing={3} sx={{ textAlign: 'left', mt: 1 }}>
       <Box>
-        <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 0.5 }}>
-          <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: '0.12em', fontWeight: 600, m: 0 }}>
+        <Stack
+          direction="row"
+          spacing={1}
+          useFlexGap
+          sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 0.5 }}
+        >
+          <Typography
+            variant="overline"
+            color="text.secondary"
+            sx={{ letterSpacing: '0.12em', fontWeight: 600, m: 0 }}
+          >
             Your estimate
           </Typography>
           <Chip size="small" label="One AI reply" variant="outlined" sx={{ fontWeight: 600 }} />
@@ -430,158 +463,379 @@ function ResultsPanel({ row }: { row: EmissionsBenchmarkRow }) {
         <Typography variant="h5" component="h2" sx={{ mt: 0.5, fontWeight: 700 }}>
           {row.Model}
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mt: 1, maxWidth: 600, lineHeight: 1.6 }}>
-          Based on published benchmarks for <strong>{lengthLabel(row.length)}</strong>. The three cards below
-          translate power, climate impact, and cooling water into everyday amounts — each for a single answer,
-          not a whole conversation.
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ mt: 1, maxWidth: 600, lineHeight: 1.6 }}
+        >
+          Based on the <strong>"How Hungry is AI?"</strong> benchmark paper for{' '}
+          <strong>{lengthLabel(row.length)}</strong>. The three cards below translate power, climate
+          impact, and cooling water into everyday amounts — each for a single answer, not a whole
+          conversation.
         </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block', maxWidth: 560 }}>
-          Technical note: the study sized prompts at about {row['Query Length'].toLocaleString()} tokens (a
-          common measure of text length for models).
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 0.75, display: 'block', maxWidth: 640 }}
+        >
+          Source:{' '}
+          <Link
+            href="https://arxiv.org/abs/2505.09598"
+            target="_blank"
+            rel="noopener noreferrer"
+            underline="hover"
+          >
+            How Hungry is AI? Benchmarking Energy, Water, and Carbon Footprint of LLM Inference
+          </Link>
+          .
+        </Typography>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 1, display: 'block', maxWidth: 560 }}
+        >
+          Technical note: the study sized prompts at about {row['Query Length'].toLocaleString()}{' '}
+          tokens (a common measure of text length for models).
         </Typography>
       </Box>
 
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} useFlexGap sx={{ flexWrap: 'wrap' }}>
-        <OneReplyStatCard icon={BoltOutlinedIcon} tint="warning" label="Electricity" value={formatPlainRange(minE, maxE, 'Wh')}>
-          Think “energy used.” One reply here is far less than running a microwave for a minute.
-        </OneReplyStatCard>
-        <OneReplyStatCard icon={Co2OutlinedIcon} tint="success" label="Climate footprint" value={formatPlainRange(minC, maxC, 'g CO₂e')}>
-          CO₂e adds up different greenhouse gases into one number. A few grams is tiny — similar in spirit to
-          many quick online tasks.
-        </OneReplyStatCard>
-        <OneReplyStatCard icon={WaterDropOutlinedIcon} tint="info" label="Cooling water (on-site)" value={formatPlainRange(minW, maxW, 'mL')}>
-          Water used at the data center for cooling — often in the ballpark of a few drops to a small sip per
-          reply.
-        </OneReplyStatCard>
-      </Stack>
-
-      {Number.isFinite(minC) && Number.isFinite(maxC) && (
-        <EpaEquivalencesCallout gCo2eMid={(minC + maxC) / 2} />
-      )}
-
-      <Box
-        sx={(theme) => ({
-          display: 'flex',
-          gap: 1.5,
-          p: 2,
-          borderRadius: 2,
-          bgcolor: alpha(theme.palette.info.main, 0.08),
-          border: '1px solid',
-          borderColor: alpha(theme.palette.info.main, 0.25),
-        })}
+      <Tabs
+        value={activeTab}
+        onChange={handleTabChange}
+        variant="scrollable"
+        allowScrollButtonsMobile
       >
-        <InfoOutlinedIcon sx={{ color: 'info.main', flexShrink: 0, fontSize: 22, mt: 0.15 }} aria-hidden />
-        <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.55 }}>
-          These numbers come from one benchmark setup. Your real chats can land higher or lower depending on
-          how long they are, how busy the service is, and where it runs.
-        </Typography>
-      </Box>
+        <Tab label="Summary view" />
+        <Tab label="Detailed report" />
+      </Tabs>
 
-      <Box>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.5 }}>
-          What if everyone asked a billion times?
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, maxWidth: 720, lineHeight: 1.55 }}>
-          Not a forecast — just a thought experiment.{' '}
-          <strong>If</strong> this benchmark applied to <strong>one billion</strong> similar prompts, the
-          study’s yardsticks are roughly like:
-        </Typography>
-        <Stack spacing={1.5}>
-          {scaleStories.map((item) => (
-            <ScaleStoryCard
-              key={item.title}
-              icon={item.icon}
-              tint={item.tint}
-              title={item.title}
-              headline={item.headline}
-              detail={item.detail}
+      {activeTab === 0 ? (
+        <>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={2}
+            useFlexGap
+            sx={{ flexWrap: 'wrap' }}
+          >
+            <OneReplyStatCard
+              icon={BoltOutlinedIcon}
+              tint="warning"
+              label="Electricity"
+              value={formatPlainRange(minE, maxE, 'Wh')}
+            >
+              Think “energy used.” One reply here is far less than running a microwave for a minute.
+            </OneReplyStatCard>
+            <OneReplyStatCard
+              icon={Co2OutlinedIcon}
+              tint="success"
+              label="Climate footprint"
+              value={formatPlainRange(minC, maxC, 'g CO₂e')}
+            >
+              CO₂e adds up different greenhouse gases into one number. A few grams is tiny — similar
+              in spirit to many quick online tasks.
+            </OneReplyStatCard>
+            <OneReplyStatCard
+              icon={WaterDropOutlinedIcon}
+              tint="info"
+              label="Cooling water (on-site)"
+              value={formatPlainRange(minW, maxW, 'mL')}
+            >
+              Water used at the data center for cooling — often in the ballpark of a few drops to a
+              small sip per reply.
+            </OneReplyStatCard>
+          </Stack>
+
+          {Number.isFinite(minC) && Number.isFinite(maxC) && (
+            <EpaEquivalencesCallout gCo2eMid={carbonMid} />
+          )}
+
+          <Box
+            sx={(theme) => ({
+              display: 'flex',
+              gap: 1.5,
+              p: 2,
+              borderRadius: 2,
+              bgcolor: alpha(theme.palette.info.main, 0.08),
+              border: '1px solid',
+              borderColor: alpha(theme.palette.info.main, 0.25),
+            })}
+          >
+            <InfoOutlinedIcon
+              sx={{ color: 'info.main', flexShrink: 0, fontSize: 22, mt: 0.15 }}
+              aria-hidden
             />
-          ))}
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.55 }}>
+              These numbers come from one benchmark setup in{' '}
+              <Link
+                href="https://arxiv.org/abs/2505.09598"
+                target="_blank"
+                rel="noopener noreferrer"
+                underline="hover"
+              >
+                "How Hungry is AI?"
+              </Link>
+              . Your real chats can land higher or lower depending on how long they are, how busy
+              the service is, and where it runs.
+            </Typography>
+          </Box>
+
+          <Accordion
+            disableGutters
+            elevation={0}
+            sx={{
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '12px !important',
+              '&:before': { display: 'none' },
+              overflow: 'hidden',
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="billion-prompts-details"
+              id="billion-prompts-header"
+            >
+              <Typography sx={{ fontWeight: 700 }}>
+                What if everyone asked a billion times?
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ pt: 0, px: 2, pb: 2 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 2, maxWidth: 720, lineHeight: 1.55 }}
+              >
+                Not a forecast — just a thought experiment. <strong>If</strong> this benchmark
+                applied to <strong>one billion</strong> similar prompts, the study’s yardsticks are
+                roughly like:
+              </Typography>
+              <Stack spacing={1.5}>
+                {scaleStories.map((item) => (
+                  <ScaleStoryCard
+                    key={item.title}
+                    icon={item.icon}
+                    tint={item.tint}
+                    title={item.title}
+                    headline={item.headline}
+                    detail={item.detail}
+                  />
+                ))}
+              </Stack>
+            </AccordionDetails>
+          </Accordion>
+
+          <Accordion
+            disableGutters
+            elevation={0}
+            sx={{
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '12px !important',
+              '&:before': { display: 'none' },
+              overflow: 'hidden',
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="technical-details"
+              id="technical-details-header"
+            >
+              <Typography sx={{ fontWeight: 600 }}>Technical details</Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ ml: 1, display: { xs: 'none', sm: 'block' } }}
+              >
+                Raw ranges, infrastructure, and 1B-prompt totals
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ pt: 0, px: 2, pb: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                For analysts and anyone who wants the numbers behind the summary.
+              </Typography>
+
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Per prompt (single query)
+              </Typography>
+              <Stack spacing={0.75} sx={{ mb: 2 }}>
+                {perPrompt.map((m) => (
+                  <Typography key={m.label} variant="body2" component="div">
+                    <strong>{m.label}:</strong> {formatNum(m.min)}–{formatNum(m.max)} {m.unit}
+                  </Typography>
+                ))}
+              </Stack>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                At 1 billion prompts (same benchmark)
+              </Typography>
+              <Stack spacing={0.75} sx={{ mb: 2 }}>
+                {scaleRaw.map((s) => (
+                  <Typography key={s.label} variant="body2" component="div">
+                    <strong>{s.label}:</strong> {formatNum(s.value)} {s.unit}
+                  </Typography>
+                ))}
+              </Stack>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Infrastructure (from dataset)
+              </Typography>
+              <Stack spacing={0.75}>
+                <Typography variant="body2">
+                  <strong>Hardware:</strong> {row.Hardware}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Host / cloud:</strong> {row.Host}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Model tier in data:</strong> {row.Size}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>PUE:</strong> {formatNum(row.PUE)}{' '}
+                  <Typography component="span" variant="caption" color="text.secondary">
+                    (power usage effectiveness — data-center overhead)
+                  </Typography>
+                </Typography>
+                <Typography variant="body2">
+                  <strong>WUE (site):</strong> {formatNum(row['WUE (Site)'])} L/kWh{' '}
+                  <Typography component="span" variant="caption" color="text.secondary">
+                    (site water per kWh)
+                  </Typography>
+                </Typography>
+                <Typography variant="body2">
+                  <strong>WUE (source):</strong> {formatNum(row['WUE (Source)'])} L/kWh{' '}
+                  <Typography component="span" variant="caption" color="text.secondary">
+                    (includes upstream water)
+                  </Typography>
+                </Typography>
+              </Stack>
+            </AccordionDetails>
+          </Accordion>
+        </>
+      ) : (
+        <Stack spacing={2.5}>
+          <Card variant="outlined" sx={{ borderColor: 'divider', boxShadow: 'none' }}>
+            <CardContent sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
+                How this calculator works
+              </Typography>
+              <Stack spacing={1}>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>1) Benchmark lookup:</strong> We match your selected model + prompt length
+                  to one row in the dataset published in{' '}
+                  <Link
+                    href="https://arxiv.org/abs/2505.09598"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    underline="hover"
+                  >
+                    "How Hungry is AI?"
+                  </Link>
+                  .
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>2) Per-reply ranges:</strong> That row provides min/max values for energy
+                  (Wh), climate footprint (gCO₂e), and water (mL). We show those ranges directly.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>3) Scale-up stories:</strong> We convert the same row to “1 billion
+                  prompts” and then map those totals into household, driving, flight, and water
+                  analogies for easier interpretation.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>4) EPA equivalents:</strong> For climate context, we also convert the
+                  midpoint of your carbon range ({formatTenth(carbonMid)} g CO₂e) using EPA
+                  equivalency factors.
+                </Typography>
+              </Stack>
+            </CardContent>
+          </Card>
+
+          <Card variant="outlined" sx={{ borderColor: 'divider', boxShadow: 'none' }}>
+            <CardContent sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
+                Core formulas used in this report
+              </Typography>
+              <Stack spacing={1}>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Midpoints for reporting:</strong> energy ≈ ({formatNum(minE)} +{' '}
+                  {formatNum(maxE)}) / 2 =<strong> {formatNum(energyMid)} Wh</strong>, carbon ≈ (
+                  {formatNum(minC)} + {formatNum(maxC)}) / 2 =
+                  <strong> {formatNum(carbonMid)} gCO₂e</strong>, water ≈ ({formatNum(minW)} +{' '}
+                  {formatNum(maxW)}) / 2 =<strong> {formatNum(waterMid)} mL</strong>.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Homes (rough):</strong> household-energy-equivalent MWh / 10.5 MWh per
+                  home-year.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>People’s drinking water (rough):</strong> kL × 1,000 / 1,500 L per
+                  person-year.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Car-years (rough):</strong> tons CO₂e / 4.6 tons per gasoline
+                  vehicle-year.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>EPA conversions:</strong> We apply EPA factors for miles driven, gasoline
+                  burned, smartphone charges, coal burned, and tree-seedling uptake.
+                </Typography>
+              </Stack>
+            </CardContent>
+          </Card>
+
+          <Card variant="outlined" sx={{ borderColor: 'divider', boxShadow: 'none' }}>
+            <CardContent sx={{ p: 2.5 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
+                Why this matters
+              </Typography>
+              <Stack spacing={1}>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Decision quality:</strong> Seeing tradeoffs in energy, water, and
+                  emissions helps teams pick models and prompt patterns more intentionally.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Responsible scaling:</strong> Small per-reply impacts can become very
+                  large at product scale; the 1B-prompt view makes that visible early.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Transparent communication:</strong> Everyday equivalences make technical
+                  sustainability data understandable for non-specialists.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Continuous improvement:</strong> Once impacts are measurable, you can
+                  track changes from model choice, caching, prompt shortening, and infrastructure
+                  shifts.
+                </Typography>
+              </Stack>
+            </CardContent>
+          </Card>
+
+          <Box
+            sx={(theme) => ({
+              display: 'flex',
+              gap: 1.5,
+              p: 2,
+              borderRadius: 2,
+              bgcolor: alpha(theme.palette.warning.main, 0.08),
+              border: '1px solid',
+              borderColor: alpha(theme.palette.warning.main, 0.25),
+            })}
+          >
+            <InfoOutlinedIcon
+              sx={{ color: 'warning.main', flexShrink: 0, fontSize: 22, mt: 0.15 }}
+              aria-hidden
+            />
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.55 }}>
+              This report is intended for transparency and planning, not exact accounting. Results
+              vary by data center, hardware, utilization, model version, and output length.
+            </Typography>
+          </Box>
         </Stack>
-      </Box>
-
-      <Accordion
-        disableGutters
-        elevation={0}
-        sx={{
-          border: '1px solid',
-          borderColor: 'divider',
-          borderRadius: '12px !important',
-          '&:before': { display: 'none' },
-          overflow: 'hidden',
-        }}
-      >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="technical-details" id="technical-details-header">
-          <Typography sx={{ fontWeight: 600 }}>Technical details</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 1, display: { xs: 'none', sm: 'block' } }}>
-            Raw ranges, infrastructure, and 1B-prompt totals
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails sx={{ pt: 0, px: 2, pb: 2 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            For analysts and anyone who wants the numbers behind the summary.
-          </Typography>
-
-          <Typography variant="subtitle2" sx={{ mb: 1 }}>
-            Per prompt (single query)
-          </Typography>
-          <Stack spacing={0.75} sx={{ mb: 2 }}>
-            {perPrompt.map((m) => (
-              <Typography key={m.label} variant="body2" component="div">
-                <strong>{m.label}:</strong> {formatNum(m.min)}–{formatNum(m.max)} {m.unit}
-              </Typography>
-            ))}
-          </Stack>
-
-          <Divider sx={{ my: 2 }} />
-
-          <Typography variant="subtitle2" sx={{ mb: 1 }}>
-            At 1 billion prompts (same benchmark)
-          </Typography>
-          <Stack spacing={0.75} sx={{ mb: 2 }}>
-            {scaleRaw.map((s) => (
-              <Typography key={s.label} variant="body2" component="div">
-                <strong>{s.label}:</strong> {formatNum(s.value)} {s.unit}
-              </Typography>
-            ))}
-          </Stack>
-
-          <Divider sx={{ my: 2 }} />
-
-          <Typography variant="subtitle2" sx={{ mb: 1 }}>
-            Infrastructure (from dataset)
-          </Typography>
-          <Stack spacing={0.75}>
-            <Typography variant="body2">
-              <strong>Hardware:</strong> {row.Hardware}
-            </Typography>
-            <Typography variant="body2">
-              <strong>Host / cloud:</strong> {row.Host}
-            </Typography>
-            <Typography variant="body2">
-              <strong>Model tier in data:</strong> {row.Size}
-            </Typography>
-            <Typography variant="body2">
-              <strong>PUE:</strong> {formatNum(row.PUE)}{' '}
-              <Typography component="span" variant="caption" color="text.secondary">
-                (power usage effectiveness — data-center overhead)
-              </Typography>
-            </Typography>
-            <Typography variant="body2">
-              <strong>WUE (site):</strong> {formatNum(row['WUE (Site)'])} L/kWh{' '}
-              <Typography component="span" variant="caption" color="text.secondary">
-                (site water per kWh)
-              </Typography>
-            </Typography>
-            <Typography variant="body2">
-              <strong>WUE (source):</strong> {formatNum(row['WUE (Source)'])} L/kWh{' '}
-              <Typography component="span" variant="caption" color="text.secondary">
-                (includes upstream water)
-              </Typography>
-            </Typography>
-          </Stack>
-        </AccordionDetails>
-      </Accordion>
+      )}
     </Stack>
   )
 }
